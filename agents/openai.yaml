@@ -1,4 +1,4 @@
 interface:
   display_name: "Agent Resume Reviewer"
-  short_description: "Audit AI-agent resumes for credibility and fit"
-  default_prompt: "Use $agent-resume-reviewer to audit my resume for technical credibility, evidence, and job fit."
+  short_description: "Evidence-first Agent resume and interview auditor"
+  default_prompt: "Use $agent-resume-reviewer in standard mode to audit my resume, verify linked evidence, and prioritize safe improvements."

@@ -1,0 +1,847 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/1122414/agent-resume-reviewer/schemas/claim-evidence-ledger.schema.json",
+  "title": "Agent Resume Claim-Evidence Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "review_id",
+    "mode",
+    "stage",
+    "language",
+    "inputs",
+    "evidence_sources",
+    "claims",
+    "projects",
+    "jd_requirements",
+    "scores",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "review_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "quick",
+        "standard",
+        "deep",
+        "jd-tailored",
+        "evidence-verify",
+        "interview-defense"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "ingested",
+        "ledger-built",
+        "evidence-located",
+        "architecture-reconstructed",
+        "scored",
+        "rewritten",
+        "completed"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "$ref": "#/$defs/inputs"
+    },
+    "evidence_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_source"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/project"
+      }
+    },
+    "jd_requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/jd_requirement"
+      }
+    },
+    "scores": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scores"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resume",
+        "job_description",
+        "target_role",
+        "target_seniority",
+        "evidence_urls"
+      ],
+      "properties": {
+        "resume": {
+          "$ref": "#/$defs/input_source"
+        },
+        "job_description": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/input_source"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_seniority": {
+          "enum": [
+            "junior",
+            "mid",
+            "senior",
+            "staff-lead",
+            "unknown"
+          ]
+        },
+        "evidence_urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "input_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "locator",
+        "format"
+      ],
+      "properties": {
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "enum": [
+            "pdf",
+            "docx",
+            "markdown",
+            "text",
+            "url",
+            "other"
+          ]
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "evidence_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "type",
+        "locator",
+        "revision",
+        "path",
+        "symbol",
+        "line_start",
+        "line_end",
+        "observation",
+        "level",
+        "inspected"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "type": {
+          "enum": [
+            "resume",
+            "github",
+            "portfolio",
+            "demo",
+            "paper",
+            "benchmark",
+            "documentation",
+            "interview",
+            "job-description",
+            "other"
+          ]
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "symbol": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "line_start": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "line_end": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "observation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3",
+            "L4"
+          ]
+        },
+        "inspected": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "relation",
+        "observation"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation": {
+          "enum": [
+            "SUPPORTS",
+            "PARTIALLY_SUPPORTS",
+            "CONTRADICTS",
+            "CONTEXT_ONLY",
+            "NOT_FOUND",
+            "INACCESSIBLE"
+          ]
+        },
+        "observation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "claim_location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "item",
+        "text"
+      ],
+      "properties": {
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "item": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_raw",
+        "baseline_raw",
+        "denominator",
+        "sample_size_raw",
+        "time_window",
+        "measurement_method"
+      ],
+      "properties": {
+        "value_raw": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseline_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "denominator": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sample_size_raw": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "time_window": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "measurement_method": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "buzzword_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "terms",
+        "verdict",
+        "underlying_primitives",
+        "reason"
+      ],
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "verdict": {
+          "enum": [
+            "KEEP",
+            "SIMPLIFY",
+            "MERGE",
+            "REMOVE",
+            "EXPAND",
+            "RENAMED_CONVENTIONAL_MECHANISM",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "underlying_primitives": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "location",
+        "claim",
+        "project_id",
+        "category",
+        "ownership",
+        "problem",
+        "mechanism",
+        "metric",
+        "evidence_refs",
+        "status",
+        "confidence",
+        "risk",
+        "missing_evidence",
+        "contradictions",
+        "rewrite_constraints",
+        "buzzword"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "location": {
+          "$ref": "#/$defs/claim_location"
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "enum": [
+            "architecture",
+            "ownership",
+            "impact",
+            "metric",
+            "reliability",
+            "evaluation",
+            "state-memory-context",
+            "tools-integration",
+            "safety",
+            "deployment",
+            "collaboration",
+            "skills",
+            "other"
+          ]
+        },
+        "ownership": {
+          "enum": [
+            "designed",
+            "implemented",
+            "led",
+            "contributed",
+            "team",
+            "unspecified",
+            "not-applicable"
+          ]
+        },
+        "problem": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mechanism": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "metric": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/metric"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_ref"
+          }
+        },
+        "status": {
+          "enum": [
+            "VERIFIED",
+            "PARTIALLY_VERIFIED",
+            "SUPPORTED",
+            "CLAIMED",
+            "UNVERIFIED",
+            "CONTRADICTED",
+            "MISSING"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "risk": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "missing_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "rewrite_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "buzzword": {
+          "$ref": "#/$defs/buzzword_assessment"
+        }
+      }
+    },
+    "architecture_component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component",
+        "status",
+        "evidence_source_ids",
+        "observation"
+      ],
+      "properties": {
+        "component": {
+          "enum": [
+            "goal-agent-boundary",
+            "planner-proposal",
+            "executor-tools",
+            "environment-observation",
+            "state-memory-context",
+            "verifier",
+            "retry-replan-recovery",
+            "safety-permissions",
+            "evaluation-tracing",
+            "deployment"
+          ]
+        },
+        "status": {
+          "enum": [
+            "VERIFIED",
+            "PARTIALLY_VERIFIED",
+            "SUPPORTED",
+            "CLAIMED",
+            "REASONABLE_INFERENCE",
+            "MISSING"
+          ]
+        },
+        "evidence_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "observation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "project_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "technical_depth",
+        "ownership",
+        "target_relevance",
+        "evidence_strength",
+        "differentiation",
+        "score",
+        "recommendation",
+        "override_reason"
+      ],
+      "properties": {
+        "technical_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "ownership": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "target_relevance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "evidence_strength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "differentiation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "recommendation": {
+          "enum": [
+            "MUST_KEEP",
+            "KEEP",
+            "OPTIONAL",
+            "REMOVE"
+          ]
+        },
+        "override_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "name",
+        "claim_ids",
+        "architecture",
+        "value"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "architecture": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/architecture_component"
+          }
+        },
+        "value": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/project_value"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "jd_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "text",
+        "priority",
+        "evidence_claim_ids",
+        "status"
+      ],
+      "properties": {
+        "requirement_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "enum": [
+            "must-have",
+            "preferred",
+            "responsibility",
+            "context",
+            "seniority"
+          ]
+        },
+        "evidence_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "DEMONSTRATED",
+            "TRANSFERABLE",
+            "UNSUPPORTED_MENTION",
+            "GAP",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "score_category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "score",
+        "max",
+        "evidence_claim_ids",
+        "finding",
+        "improvement"
+      ],
+      "properties": {
+        "key": {
+          "enum": [
+            "technical-credibility",
+            "agent-architecture-depth",
+            "engineering-difficulty",
+            "ownership",
+            "measurable-impact",
+            "technical-communication",
+            "jd-match-ats",
+            "structure-readability"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "evidence_claim_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "finding": {
+          "type": "string",
+          "minLength": 1
+        },
+        "improvement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_total",
+        "max_total",
+        "normalized_total",
+        "provisional",
+        "categories"
+      ],
+      "properties": {
+        "raw_total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_total": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "normalized_total": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "provisional": {
+          "type": "boolean"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/score_category"
+          }
+        }
+      }
+    }
+  }
+}
